@@ -1,6 +1,6 @@
 {
   "name": "lm",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Claude weekly limit at a glance: week passed, limit used, forecast at the reset, the pace per day and the 5-hour window, in one line under the prompt.",
   "author": {
     "name": "brd666"

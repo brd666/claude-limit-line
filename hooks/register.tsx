@@ -35,7 +35,7 @@ const STORE_CARD = 'card-1'
 const STORE_PANE = 'pane-1'
 const STORE_LOADED = 'loaded-1'
 // Bumped with each change, so a check from outside sees which code runs.
-const VERSION = '0.1.0'
+const VERSION = '0.1.1'
 
 // The desktop app's usage card: the figures its usage circle shows. The API
 // responses' own figures lag it by a point or so.
@@ -249,6 +249,13 @@ export const register: Register = on => {
     $.clock.after(1_000, () => {
       quietly(readCard($))
     })
+    // A line sent before the app has joined a new chat is lost: send it again
+    // once the app is there.
+    for (const wait of [3_000, 10_000]) {
+      $.clock.after(wait, () => {
+        quietly(showStatus($))
+      })
+    }
     $.clock.every(CARD_EVERY, () => {
       quietly(readCard($))
     })
