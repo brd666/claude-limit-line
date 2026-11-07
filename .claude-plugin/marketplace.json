@@ -6,7 +6,7 @@
   "description": "A one-line view of your Claude weekly limit under the Claude Code prompt.",
   "plugins": [
     {
-      "name": "l",
+      "name": "lm",
       "source": "./",
       "description": "Claude weekly limit at a glance: week passed, limit used, forecast at the reset, the pace per day and the 5-hour window, in one line under the prompt."
     }

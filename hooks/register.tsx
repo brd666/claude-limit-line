@@ -8,19 +8,19 @@ import type { Tone } from './forecast'
 
 // Change a tag when that value's fields change: it declines what an earlier
 // version stored, which outlives a reload.
-const reading = atom({ plugin: 'l', key: 'reading' } as const, null, {
+const reading = atom({ plugin: 'lm', key: 'reading' } as const, null, {
   shape: 'reading-1',
 })
-const samples = atom({ plugin: 'l', key: 'samples' } as const, [], {
+const samples = atom({ plugin: 'lm', key: 'samples' } as const, [], {
   shape: 'samples-1',
 })
 // Moves once a minute so the figures redraw between turns.
-const tick = atom({ plugin: 'l', key: 'tick' } as const, 0)
+const tick = atom({ plugin: 'lm', key: 'tick' } as const, 0)
 // Where the figures show (View): beside the model and mode under the prompt
 // until the person picks the band or the pane with /limit.
-const view = atom({ plugin: 'l', key: 'view' } as const, 'line')
+const view = atom({ plugin: 'lm', key: 'view' } as const, 'line')
 // Whether the pane is placed on screen now; while it is not, the band stands in.
-const paneUp = atom({ plugin: 'l', key: 'paneUp' } as const, false)
+const paneUp = atom({ plugin: 'lm', key: 'paneUp' } as const, false)
 
 const PANE = 'limit-pace'
 const PANE_TITLE = 'Limit'

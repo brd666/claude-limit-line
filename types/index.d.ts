@@ -19,7 +19,7 @@ export type View = 'line' | 'band' | 'pane'
 
 declare module 'claude-code' {
   interface PluginState {
-    'l': {
+    'lm': {
       reading: Shaped<Reading | null>
       samples: Shaped<Sample[]>
       tick: number

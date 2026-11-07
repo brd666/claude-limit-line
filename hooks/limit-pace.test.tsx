@@ -17,7 +17,7 @@ const READING = {
 }
 
 const BAND = {
-  plugin: 'l',
+  plugin: 'lm',
   component: 'AbovePrompt',
   props: {
     hasSurvey: false,
@@ -30,7 +30,7 @@ const BAND = {
 } as const
 
 const PANE = {
-  plugin: 'l',
+  plugin: 'lm',
   component: 'Pane',
   requestId: 'limit-pace',
   props: {

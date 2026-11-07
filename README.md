@@ -4,7 +4,7 @@ One line under the Claude Code prompt that tells you whether you are burning
 through your weekly limit too fast or leaving it unused:
 
 ```
-l  Week 38% · Used 29% · fc ~77% · avg 10.9 → 16.3%/d · 5h 40%
+lm  Week 38% · Used 29% · fc ~77% · avg 10.9 → 16.3%/d · 5h 40%
 ```
 
 | Field | Meaning |
@@ -23,7 +23,7 @@ means you have room to use more. Above it means you are ahead of your budget.
 At the prompt of a terminal session (`claude`):
 
 ```
-/plugin install l --marketplace brd666/claude-limit-line
+/plugin install lm --marketplace brd666/claude-limit-line
 ```
 
 Answer `y` to add the marketplace, then press Enter for the user scope.
@@ -31,7 +31,7 @@ Answer `y` to add the marketplace, then press Enter for the user scope.
 From a shell:
 
 ```
-claude plugin install l --marketplace brd666/claude-limit-line
+claude plugin install lm --marketplace brd666/claude-limit-line
 ```
 
 In the Claude desktop app, where `/plugin` does not run: click **+** next to the
