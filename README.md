@@ -6,7 +6,7 @@ through your weekly limit too fast or leaving it unused:
 ![The lm line under the prompt in the Claude desktop app, beside the model's name](docs/screenshot.png)
 
 ```
-lm  Week 38% · Used 30% · fc ~79% · today 2/15% · 5h 51%
+lm  Week 38% · Used 30% · fc ~79% · today 2/15% · 5h 53%
 ```
 
 | Field | Meaning |
