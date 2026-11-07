@@ -101,6 +101,45 @@ export function recentPerDay(samples: Sample[], week: Win, at: number): number |
   return (Math.max(0, week.pct - first.p) / hours) * 24
 }
 
+/** Today's share of the weekly limit: what is spent since the day began, and the allowance. */
+export type Today = { spent: number; allowance: number }
+
+/**
+ * Today, from local midnight (or the week's start, where that came later):
+ * what of the limit is spent since, and the day's even share of what was left
+ * when the day began, the rest being shared out over the days to the reset.
+ *
+ * The figure at midnight is the last stored reading before it; where none is
+ * stored (the mod has not run since), the first one today stands in.
+ */
+export function today(samples: Sample[], week: Win, at: number): Today {
+  const weekStart = week.resetsAt - WEEK
+  const midnight = new Date(at)
+  midnight.setHours(0, 0, 0, 0)
+  const nextMidnight = new Date(midnight)
+  nextMidnight.setDate(nextMidnight.getDate() + 1)
+  const dayStart = Math.max(midnight.getTime(), weekStart)
+  const dayEnd = Math.min(nextMidnight.getTime(), week.resetsAt)
+  const inWeek = samples
+    .filter(s => sameWeek(s.r, week.resetsAt))
+    .sort((a, b) => a.t - b.t)
+  const before = inWeek.filter(s => s.t <= dayStart)
+  const firstToday = inWeek.find(s => s.t > dayStart && s.t <= at)
+  const atStart =
+    dayStart === weekStart
+      ? 0
+      : Math.min(
+          week.pct,
+          before.length > 0 ? before[before.length - 1].p : (firstToday?.p ?? week.pct),
+        )
+  const span = week.resetsAt - dayStart
+
+  return {
+    spent: Math.max(0, week.pct - atStart),
+    allowance: span > 0 ? (Math.max(0, 100 - atStart) * (dayEnd - dayStart)) / span : 0,
+  }
+}
+
 /** Adds the reading's weekly percent to the samples; keeps this week's, oldest first. */
 export function remember(samples: Sample[], reading: Reading): Sample[] {
   const week = reading.windows.find(w => w.kind === 'seven_day')
@@ -156,11 +195,13 @@ export function describe(reading: Reading, samples: Sample[], now: number): Line
     { label: 'Week', value: `${whole(f.timeShare)}%` },
     usedPart,
   ]
-  // The average a day so far, then the one that lands on 100% at the reset.
-  const avgPart: BriefPart = {
-    label: 'avg',
-    value: `${num(f.perDayNow)} → ${num(f.perDayAllowed)}%/d`,
+  // Spent today, of today's even share of what is left.
+  const day = today(samples, week, reading.at)
+  const todayPart: BriefPart = {
+    label: 'today',
+    value: `${whole(day.spent)}/${whole(day.allowance)}%`,
   }
+  const todayPlan = `today ${whole(day.spent)}% of ${whole(day.allowance)}%`
 
   if (week.pct >= 100) {
     return {
@@ -175,8 +216,8 @@ export function describe(reading: Reading, samples: Sample[], now: number): Line
     return {
       tone: 'early',
       head: `${passed} · too early for pace${fiveHour}`,
-      plan: [`can spend ${budget}`, ...stale].join(' · '),
-      ...short([...passedParts, ...fivePart]),
+      plan: [`can spend ${budget}`, todayPlan, ...stale].join(' · '),
+      ...short([...passedParts, todayPart, ...fivePart]),
     }
   }
 
@@ -199,12 +240,13 @@ export function describe(reading: Reading, samples: Sample[], now: number): Line
       plan: [
         `runs out ${when(f.runsOutAt, now)}`,
         `keep under ${budget}, ${rate}`,
+        todayPlan,
         ...stale,
       ].join(' · '),
       ...short([
         ...passedParts,
         { label: 'runs out', value: when(f.runsOutAt, now) },
-        avgPart,
+        todayPart,
         ...fivePart,
       ]),
     }
@@ -218,12 +260,13 @@ export function describe(reading: Reading, samples: Sample[], now: number): Line
     plan: [
       `forecast ~${whole(f.projected)}%${unused}`,
       `can spend ${budget}, ${rate}`,
+      todayPlan,
       ...stale,
     ].join(' · '),
     ...short([
       ...passedParts,
       { label: 'fc', value: `~${whole(f.projected)}%` },
-      avgPart,
+      todayPart,
       ...fivePart,
     ]),
   }

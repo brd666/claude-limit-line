@@ -6,7 +6,7 @@ through your weekly limit too fast or leaving it unused:
 ![The lm line under the prompt in the Claude desktop app, beside the model's name](docs/screenshot.png)
 
 ```
-lm  Week 38% · Used 30% · fc ~79% · avg 11.3 → 16.1%/d · 5h 46%
+lm  Week 38% · Used 30% · fc ~79% · today 2/15% · 5h 51%
 ```
 
 | Field | Meaning |
@@ -14,11 +14,15 @@ lm  Week 38% · Used 30% · fc ~79% · avg 11.3 → 16.1%/d · 5h 46%
 | `Week` | how much of the current weekly window has passed |
 | `Used` | how much of the weekly limit you have used |
 | `fc` | forecast: where `Used` lands at the reset if you keep your pace so far. When you would run out first, it says `runs out <day> <time>` instead |
-| `avg` | your average use per day so far → the use per day that lands on exactly 100% at the reset |
+| `today` | spent today / today's allowance: what is left of the limit at midnight, shared out evenly over the days to the reset |
 | `5h` | the 5-hour window |
 
-Reading it: `Used` below `Week`, or the first `avg` figure below the second,
-means you have room to use more. Above it means you are ahead of your budget.
+Reading it: `Used` below `Week` means you have room to use more this week;
+above it, you are ahead of your budget. `today 2/15%` means 2% spent today of
+the 15% you can spend today and still last to the reset.
+
+`today` counts from local midnight, from the last reading the plugin stored
+before it: on the day you install it, it counts from its first reading.
 
 ## Install
 
@@ -45,7 +49,7 @@ terminal at the user scope also loads in the desktop app's Code sessions.
 
 | Command | What it does |
 | --- | --- |
-| `/limit` | the full picture: pace, forecast, how much you can use per day |
+| `/limit` | the full picture: pace, forecast, how much you can use per day and today |
 | `/limit band` | two lines above the prompt instead of the one under it |
 | `/limit panel` | a panel beside the chat (with a Close button) |
 | `/limit line` | back to the one line under the prompt |
@@ -69,8 +73,8 @@ Built and tested with Claude Code 2.1.317 (plugin hook modules).
 
 Строка под полем ввода Claude Code: сколько прошло недели (`Week`), сколько
 потрачено недельного лимита (`Used`), прогноз к сбросу при нынешнем темпе
-(`fc`), средний расход в день сейчас → сколько нужно в день, чтобы к сбросу
-выйти ровно на 100% (`avg`), и 5-часовое окно (`5h`). Установка — командами
+(`fc`), сколько потрачено сегодня / сколько можно потратить сегодня, чтобы
+дотянуть до сброса (`today`), и 5-часовое окно (`5h`). Установка — командами
 выше. `/limit` показывает подробный расчёт.
 
 ## License

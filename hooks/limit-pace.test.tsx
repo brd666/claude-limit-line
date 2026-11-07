@@ -1,7 +1,7 @@
 import { expect, test } from 'claude-code/testing'
 
 import { fromCard } from './card'
-import { HOUR, describe, forecast, remember, when } from './forecast'
+import { HOUR, describe, forecast, remember, today, when } from './forecast'
 
 // A weekly window that resets on a Wednesday, read on the Saturday before it
 // with 26% used: 37% of the week gone.
@@ -89,8 +89,8 @@ test('samples keep this week only and skip an unchanged reading', async () => {
 test('the short line has the forecast and the average a day, no verdict', async () => {
   const lines = describe(READING, [], NOW + 60_000)
 
-  expect(lines?.brief).toBe(
-    'Week 37% · Used 26% · fc ~70% · avg 10.0 → 16.8%/d · 5h 20%',
+  expect(/^Week 37% · Used 26% · fc ~70% · today 0\/\d+% · 5h 20%$/.test(lines?.brief ?? '')).toBe(
+    true,
   )
 })
 
@@ -106,9 +106,11 @@ test('the band shows the pace on every surface, when picked', async ($, on) => {
     expect(head?.text).toBe(
       'Week 37% · Used 26% · pace 0.70× — under budget · 5h 20%',
     )
-    expect(plan?.text).toBe(
-      'forecast ~70%, 30% unused · can spend 16.8%/day, avg 10.0%/day',
-    )
+    expect(
+      /^forecast ~70%, 30% unused · can spend 16\.8%\/day, avg 10\.0%\/day · today 0% of \d+%$/.test(
+        plan?.text ?? '',
+      ),
+    ).toBe(true)
     expect(await ui.find({ type: 'Text', text: /reset/i })).toBe(undefined)
     await ui.unmount()
   }
@@ -142,7 +144,7 @@ test('ahead of budget says when it runs out; an old reading says so', async () =
   expect(lines?.plan.endsWith(`data from ${when(NOW, NOW + 20 * 60_000)}`)).toBe(true)
   expect(lines?.brief.includes('runs out ')).toBe(true)
   // Ahead of budget the average to land on 100% is below the one so far.
-  expect(lines?.brief.endsWith('avg 23.1 → 9.1%/d')).toBe(true)
+  expect(/ · today 0\/\d+%$/.test(lines?.brief ?? '')).toBe(true)
 })
 
 // What the desktop app's usage card answers (trimmed), with 27% used.
@@ -190,9 +192,9 @@ test('/limit reads the card when the tool is allowed', async ($, on) => {
 
   expect(String(answer.text).startsWith('Week 37% · Used 27%')).toBe(true)
   expect(String(answer.text).includes('5h 25%')).toBe(true)
-  expect(JSON.stringify(statuses.at(-1))).toContain(
-    'Week 37% · Used 27% · fc ~73% · avg 10.4 → 16.6%/d · 5h 25%',
-  )
+  expect(
+    /Week 37% · Used 27% · fc ~73% · today 0\/\d+% · 5h 25%/.test(JSON.stringify(statuses.at(-1))),
+  ).toBe(true)
 })
 
 test('/limit opens no dialog where the tool is not allowed', async ($, on) => {
@@ -301,10 +303,38 @@ test('the status line carries the whole short line, and leaves for the band', as
     })
 
   await run('')
-  expect(JSON.stringify(statuses.at(-1))).toContain(
-    'Week 37% · Used 27% · fc ~73% · avg 10.4 → 16.6%/d · 5h 25%',
-  )
+  expect(
+    /Week 37% · Used 27% · fc ~73% · today 0\/\d+% · 5h 25%/.test(JSON.stringify(statuses.at(-1))),
+  ).toBe(true)
 
   await run('band')
   expect(JSON.stringify(statuses.at(-1))).not.toContain('Week')
+})
+
+
+test('today counts from midnight and shares out what was left then', async () => {
+  const midnight = new Date(NOW)
+  midnight.setHours(0, 0, 0, 0)
+  const next = new Date(midnight)
+  next.setDate(next.getDate() + 1)
+  const week = { kind: 'seven_day', pct: 26, resetsAt: RESET }
+  const samples = [
+    { t: midnight.getTime() - HOUR, p: 20, r: RESET },
+    { t: NOW - HOUR, p: 24, r: RESET },
+  ]
+  const day = today(samples, week, NOW)
+  const share =
+    (80 * (Math.min(next.getTime(), RESET) - midnight.getTime())) /
+    (RESET - midnight.getTime())
+
+  expect(day.spent).toBe(6)
+  expect(Math.abs(day.allowance - share) < 1e-9).toBe(true)
+  // With nothing stored before today, the day counts from its first reading.
+  expect(today([{ t: NOW - HOUR, p: 24, r: RESET }], week, NOW).spent).toBe(2)
+  // With nothing stored at all, nothing is spent today yet.
+  expect(today([], week, NOW).spent).toBe(0)
+  // The short line carries it in place of the average.
+  const lines = describe({ ...READING, at: NOW }, samples, NOW + 60_000)
+  expect(lines?.brief.includes(`today 6/${Math.round(share)}%`)).toBe(true)
+  expect(lines?.brief.includes('avg')).toBe(false)
 })

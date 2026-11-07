@@ -8,7 +8,7 @@
     {
       "name": "lm",
       "source": "./",
-      "description": "Claude weekly limit at a glance: week passed, limit used, forecast at the reset, the pace per day and the 5-hour window, in one line under the prompt."
+      "description": "Claude weekly limit at a glance: week passed, limit used, forecast at the reset, spent today of today's allowance and the 5-hour window, in one line under the prompt."
     }
   ]
 }

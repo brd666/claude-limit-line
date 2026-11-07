@@ -35,7 +35,7 @@ const STORE_CARD = 'card-1'
 const STORE_PANE = 'pane-1'
 const STORE_LOADED = 'loaded-1'
 // Bumped with each change, so a check from outside sees which code runs.
-const VERSION = '0.1.1'
+const VERSION = '0.2.0'
 
 // The desktop app's usage card: the figures its usage circle shows. The API
 // responses' own figures lag it by a point or so.
