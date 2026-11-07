@@ -3,8 +3,10 @@
 One line under the Claude Code prompt that tells you whether you are burning
 through your weekly limit too fast or leaving it unused:
 
+![The lm line under the prompt in the Claude desktop app, beside the model's name](docs/screenshot.png)
+
 ```
-lm  Week 38% · Used 29% · fc ~77% · avg 10.9 → 16.3%/d · 5h 40%
+lm  Week 38% · Used 30% · fc ~79% · avg 11.3 → 16.1%/d · 5h 46%
 ```
 
 | Field | Meaning |
