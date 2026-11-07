@@ -1,0 +1,18 @@
+{
+  "name": "l",
+  "version": "0.1.0",
+  "description": "Claude weekly limit at a glance: week passed, limit used, forecast at the reset, the pace per day and the 5-hour window, in one line under the prompt.",
+  "author": {
+    "name": "brd666"
+  },
+  "homepage": "https://github.com/brd666/claude-limit-line",
+  "repository": "https://github.com/brd666/claude-limit-line",
+  "license": "MIT",
+  "keywords": [
+    "usage",
+    "limits",
+    "rate-limit",
+    "status-line"
+  ],
+  "types": "./types/index.d.ts"
+}
